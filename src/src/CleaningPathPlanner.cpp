@@ -28,10 +28,12 @@ CleaningPathPlanning::CleaningPathPlanning(costmap_2d::Costmap2DROS *costmap2d_r
 
     int sizex = costmap2d_->getSizeInCellsX();
     int sizey = costmap2d_->getSizeInCellsY();
-    cout<<"The size of map is "<<sizex<<"  "<<sizey<<endl;
+    cout<<"The size of map is "<<sizex<<"*"<<sizey<<endl;
     resolution_ = costmap2d_->getResolution();
 
     srcMap_=Mat(sizey,sizex,CV_8U);
+    //此刻表示创建一个sizey*sizey大小的像素块，每个像素都是三通道每个通道的位数都是8位，一个字节的。
+    // 上述CV_8UC3中的8表示8位、UC表示uchar类型、3表示三个通道。
     for(int r = 0; r < sizey; r++){
       for(int c = 0; c < sizex; c++ ){
           srcMap_.at<uchar>(r,c) = costmap2d_->getCost(c,sizey-r-1);//??sizey-r-1 caution: costmap's origin is at left bottom ,while opencv's pic's origin is at left-top.
@@ -380,6 +382,9 @@ void CleaningPathPlanning::writeResult(Mat resultmat,vector<cv::Point2i> pathVec
 //    waitKey(0);
 }
 
+
+
+// 路径规划算
 void CleaningPathPlanning::mainPlanningLoop()
 {
     cellIndex initPoint,nextPoint, currentPoint;
