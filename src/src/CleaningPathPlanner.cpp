@@ -240,7 +240,7 @@ void CleaningPathPlanning::PublishGrid()
 vector<cellIndex> CleaningPathPlanning::GetPathInCV()
 {
     mainPlanningLoop();
-    return this->pathVec_;
+    return this->pathVec_ //它指向当前对象，通过它可以访问当前对象的所有成员this 只能用在类的内部，通过 this 可以访问类的所有成员，包括 private、protected、public 属性的
 }
 
 void CleaningPathPlanning::PublishCoveragePath(){
@@ -283,6 +283,8 @@ bool CleaningPathPlanning::initializeMats()
     getCellMatAndFreeSpace(srcMap_,cellMat_,freeSpaceVec_);
 
     neuralizedMat_ = Mat(cellMat_.rows,cellMat_.cols,CV_32F);
+    //CV_32F或者CV_64F取值范围为0~1.0如果图像是32位或64位浮点型（32-bit floating-point or 64-bit floating-point），
+    // 像素值便要乘以255。也就是说，该值的范围是 [0,1]映射到[0,255]。
     initializeNeuralMat(cellMat_,neuralizedMat_);
     return true;
 }
@@ -431,14 +433,14 @@ void CleaningPathPlanning::mainPlanningLoop()
         for(it=freeSpaceVec_.begin();it!=freeSpaceVec_.end();)
         {
             if((*it).row==nextPoint.row && (*it).col==nextPoint.col)
-            {it = freeSpaceVec_.erase(it);continue;}
+            {it = freeSpaceVec_.erase(it);continue;} //erase删除容器中元素的函数
             it++;
         }
 
         //compute neiborhood's activities
         int maxIndex = 0;
         float max_v = -3;
-        neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col) = -2.0;
+        neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col) = -2.0;  //返回容器位置为n的元素的引用
         for(int id = 0; id < 8; id++)
         {
             deltaTheta = max(thetaVec[id],lasttheta)-min(thetaVec[id],lasttheta);
