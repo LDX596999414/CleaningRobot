@@ -65,7 +65,7 @@ vector<geometry_msgs::PoseStamped> CleaningPathPlanning::GetPathInROS()
     /*trasnsform*/
     vector<cellIndex>::iterator iter;
     int sizey = cellMat_.rows;
-    double theta, last_theta;
+    double CellTOCell_theta, CellTOCell_last_theta;
     for(iter=cellvec.begin(); iter!=cellvec.end();iter++)
     {
         costmap2d_->mapToWorld((*iter).col * SIZE_OF_CELL + SIZE_OF_CELL/2 , (sizey-(*iter).row-1)*SIZE_OF_CELL + SIZE_OF_CELL/2, pose.position.x, pose.position.y);
@@ -73,23 +73,31 @@ vector<geometry_msgs::PoseStamped> CleaningPathPlanning::GetPathInROS()
         pose.orientation.x = 0;
         pose.orientation.y = 0;
         pose.orientation.z = sin((*iter).theta * PI / 180 / 2);
-        ROS_INFO("pose x %f y %f z %f", pose.position.x, pose.position.y, pose.position.z);
-        theta = atan2(pose.position.y - last_pose.position.y, pose.position.x - last_pose.position.x);
+      //  ROS_INFO("pose x %f y %f z %f", pose.position.x, pose.position.y, pose.position.z);
+        CellTOCell_theta = atan2(pose.position.y - last_pose.position.y, pose.position.x - last_pose.position.x);
         last_pose = pose;
-        ROS_INFO("pose yaw %f line theta %f", tf::getYaw(pose.orientation), theta);
-        if(theta == last_theta)
-        {
-            continue;
-        }
-        last_theta = theta;
-        posestamped.header.stamp= ros::Time::now();
-        posestamped.header.frame_id = "map";
-        posestamped.pose = pose;
+       // ROS_INFO("pose yaw %f line theta %f", tf::getYaw(pose.orientation), theta);
 
+        if(CellTOCell_theta == CellTOCell_last_theta) {
+
+            posestamped.header.stamp = ros::Time::now();
+            posestamped.header.frame_id = "map";
+            posestamped.pose = pose;
+            pathVecInROS_.pop_back();
+
+        }
+        else
+        {
+            posestamped.header.stamp = ros::Time::now();
+            posestamped.header.frame_id = "map";
+            posestamped.pose = pose;
+
+        }
+        CellTOCell_last_theta= CellTOCell_theta;
         pathVecInROS_.push_back(posestamped);
     }
     publishPlan(pathVecInROS_);
-    cout<<"The path size is "<<pathVecInROS_.size()<<endl;
+    cout<<"The Filtered path size is "<<pathVecInROS_.size()<<endl;
     return pathVecInROS_;
 }
 
