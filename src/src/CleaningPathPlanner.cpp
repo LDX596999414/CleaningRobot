@@ -250,7 +250,7 @@ void CleaningPathPlanning::PublishGrid()
 vector<cellIndex> CleaningPathPlanning::GetPathInCV()
 {
     mainPlanningLoop();
-    return this->pathVec_ //它指向当前对象，通过它可以访问当前对象的所有成员this 只能用在类的内部，通过 this 可以访问类的所有成员，包括 private、protected、public 属性的
+    return this->pathVec_ ;//它指向当前对象，通过它可以访问当前对象的所有成员this 只能用在类的内部，通过 this 可以访问类的所有成员，包括 private、protected、public 属性的
 }
 
 void CleaningPathPlanning::PublishCoveragePath(){
