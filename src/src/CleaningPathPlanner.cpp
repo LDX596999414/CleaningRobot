@@ -74,16 +74,20 @@ vector<geometry_msgs::PoseStamped> CleaningPathPlanning::GetPathInROS()
         pose.orientation.y = 0;
         pose.orientation.z = sin((*iter).theta * PI / 180 / 2);
       //  ROS_INFO("pose x %f y %f z %f", pose.position.x, pose.position.y, pose.position.z);
+      // 判断当前点和上一点之前有无角度变化。如果有保留该点，如果没有清除上一点。
         CellTOCell_theta = atan2(pose.position.y - last_pose.position.y, pose.position.x - last_pose.position.x);
         last_pose = pose;
        // ROS_INFO("pose yaw %f line theta %f", tf::getYaw(pose.orientation), theta);
-
+         //对路径进行过滤，只保留拐弯点；
         if(CellTOCell_theta == CellTOCell_last_theta) {
 
             posestamped.header.stamp = ros::Time::now();
             posestamped.header.frame_id = "map";
             posestamped.pose = pose;
-            pathVecInROS_.pop_back();
+            if(pathVecInROS_.size() >=3)
+            {
+                pathVecInROS_.pop_back();
+            }
 
         }
         else
@@ -96,6 +100,8 @@ vector<geometry_msgs::PoseStamped> CleaningPathPlanning::GetPathInROS()
         CellTOCell_last_theta= CellTOCell_theta;
         pathVecInROS_.push_back(posestamped);
     }
+
+   // pathVecInROS_.insert(pathVecInROS_.begin(),);
     publishPlan(pathVecInROS_);
     cout<<"The Filtered path size is "<<pathVecInROS_.size()<<endl;
     return pathVecInROS_;

@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /CoveredMap1
         - /Local Plan1
+        - /CoveragePath1
         - /Marker1/Namespaces1
         - /Inflated Obstacles1
         - /Pose Array1
@@ -73,7 +74,7 @@ Visualization Manager:
       Draw Behind: true
       Enabled: true
       Name: CoveredMap
-      Topic: /cleaning_covering_node/cleaning_costmap/costmap
+      Topic: /move_base/global_costmap/costmap
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -97,7 +98,7 @@ Visualization Manager:
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /move_base/TrajectoryPlannerROS/local_plan
+      Topic: /move_base/FTCPlanner/local_plan
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -120,7 +121,7 @@ Visualization Manager:
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /cleaning_covering_node/cleaning_plan_nodehandle/cleaning_path
+      Topic: /path_planning_node/cleaning_plan_nodehandle/cleaning_path
       Unreliable: false
       Value: true
     - Alpha: 1
