@@ -447,7 +447,7 @@ void CleaningPathPlanning::mainPlanningLoop()
     float initTheta = initPoint.theta; //initial orientation
     const float c_0 = 0.001;
     float e = 0.0, v = 0.0, deltaTheta = 0.0, lasttheta = initTheta, PI = 3.14159;
-    vector<float> thetaVec = {0, 45,90,135,180,225,270,315};
+    vector<float> thetaVec = {0, 90,180,270};
 
     //the main planning loop
     while(freeSpaceVec_.size()>0)
@@ -465,7 +465,7 @@ void CleaningPathPlanning::mainPlanningLoop()
         int maxIndex = 0;
         float max_v = -3;
         neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col) = -2.0;  //返回容器位置为n的元素的引用
-        for(int id = 0; id < 8; id++)
+        for(int id = 0; id < 4; id++)
         {
             deltaTheta = max(thetaVec[id],lasttheta)-min(thetaVec[id],lasttheta);
             if(deltaTheta>180) deltaTheta=360-deltaTheta;
@@ -477,32 +477,16 @@ void CleaningPathPlanning::mainPlanningLoop()
                     v = neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col+1) + c_0 * e;
                     break;
                 case 1:
-                if(currentPoint.col==neuralizedMat_.cols-1 || currentPoint.row == 0){v=-2;break;}
-                    v = neuralizedMat_.at<float>(currentPoint.row-1 ,currentPoint.col+1) + c_0 * e;
-                    break;
-                case 2:
-                if(currentPoint.row == 0){v=-2;break;}
+                    if(currentPoint.row == 0){v=-2;break;}
                     v = neuralizedMat_.at<float>(currentPoint.row-1 ,currentPoint.col) + c_0 * e;
                     break;
-                case 3:
-                if(currentPoint.col== 0 || currentPoint.row == 0){v=-2;break;}
-                    v = neuralizedMat_.at<float>(currentPoint.row-1 ,currentPoint.col-1) + c_0 * e;
-                    break;
-                case 4:
-                if(currentPoint.col== 0){v=-2;break;}
+                case 2:
+                    if(currentPoint.col== 0){v=-2;break;}
                     v = neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col-1) + c_0 * e;
                     break;
-                case 5:
-                if(currentPoint.col== 0 || currentPoint.row == neuralizedMat_.rows-1){v=-2;break;}
-                    v = neuralizedMat_.at<float>(currentPoint.row+1 ,currentPoint.col-1) + c_0 * e;
-                    break;
-                case 6:
-                if(currentPoint.row == neuralizedMat_.rows-1){v=-2;break;}
+                case 3:
+                    if(currentPoint.row == neuralizedMat_.rows-1){v=-2;break;}
                     v = neuralizedMat_.at<float>(currentPoint.row+1 ,currentPoint.col) + c_0 * e;
-                    break;
-                case 7:
-                if(currentPoint.col==neuralizedMat_.cols-1 || currentPoint.row == neuralizedMat_.rows-1){v=-2;break;}
-                    v = neuralizedMat_.at<float>(currentPoint.row+1 ,currentPoint.col+1) + c_0 * e;
                     break;
                 default:
                     break;
@@ -556,33 +540,17 @@ void CleaningPathPlanning::mainPlanningLoop()
             break;
         case 1:
             nextPoint.row = currentPoint.row-1;
-            nextPoint.col = currentPoint.col+1;
-            break;
-        case 2:
-            nextPoint.row = currentPoint.row-1;
             nextPoint.col = currentPoint.col;
             break;
-        case 3:
-            nextPoint.row = currentPoint.row-1;
-            nextPoint.col = currentPoint.col-1;
-            break;
-        case 4:
+        case 2:
             nextPoint.row = currentPoint.row;
             nextPoint.col = currentPoint.col-1;
             break;
-        case 5:
-            nextPoint.row = currentPoint.row+1;
-            nextPoint.col = currentPoint.col-1;
-            break;
-        case 6:
+        case 3:
             nextPoint.row = currentPoint.row+1;
             nextPoint.col = currentPoint.col;
             break;
-        case 7:
-            nextPoint.row = currentPoint.row+1;
-            nextPoint.col = currentPoint.col+1;
-            break;
-        default:
+            default:
             break;
         }
         nextPoint.theta = thetaVec[maxIndex];

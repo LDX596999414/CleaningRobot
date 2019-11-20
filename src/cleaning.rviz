@@ -74,7 +74,7 @@ Visualization Manager:
       Draw Behind: true
       Enabled: true
       Name: CoveredMap
-      Topic: /move_base/global_costmap/costmap
+      Topic: /map
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -104,7 +104,7 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 0; 213; 0
+      Color: 0; 0; 255
       Enabled: true
       Head Diameter: 0.300000012
       Head Length: 0.200000003
@@ -221,7 +221,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Inflated Obstacles
-      Topic: /move_base/local_costmap/costmap
+      Topic: /path_planning_node/cleaning_costmap/costmap
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -285,7 +285,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 163.699692
+      Scale: 47.4893303
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 0.55702424

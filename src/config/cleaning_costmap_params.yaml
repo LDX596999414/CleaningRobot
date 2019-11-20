@@ -7,9 +7,9 @@ cleaning_costmap:
    rolling_window: false
    resolution: 0.05
    transform_tolerance: 1.0
-   inflation_radius: 1
+   inflation_radius: 0.1
    map_type: costmap
 
 cleaning_plan_nodehandle:   
-   size_of_cell: 5
+   size_of_cell: 8
    grid_covered_value: 200
