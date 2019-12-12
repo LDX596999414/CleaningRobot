@@ -359,6 +359,8 @@ void CleaningPathPlanning::getCellMatAndFreeSpace(Mat srcImg, Mat &cellMat,vecto
     return;
 }
 
+/*在这里，如果neuralizeMat里面i,j对应的格子如果有障碍物，则权重为-1.0,否则为1.0/j,设为1.0/j的原因是因为让机器人
+沿着靠左走的原则*/
 void CleaningPathPlanning::initializeNeuralMat(Mat cellMat, Mat neuralizedMat)
 {
     int i = 0,j = 0;
@@ -367,7 +369,15 @@ void CleaningPathPlanning::initializeNeuralMat(Mat cellMat, Mat neuralizedMat)
         for(j = 0;j< neuralizedMat.cols; j++ )
         {
             if(cellMat.at<uchar>(i,j) == costmap_2d::LETHAL_OBSTACLE) neuralizedMat.at<float>(i,j) = -1.0;
-            else neuralizedMat.at<float>(i,j) = 1.0 / j;
+            else if(neuralizedMat.rows <= neuralizedMat.cols)
+            {
+
+                neuralizedMat.at<float>(i,j) = 1.0 / j;
+            }
+            else if(neuralizedMat.rows > neuralizedMat.cols)
+            {
+                neuralizedMat.at<float>(i,j) = 1.0 / i;
+            }
         }
     }
     return;
@@ -415,7 +425,12 @@ void CleaningPathPlanning::writeResult(Mat resultmat,vector<cv::Point2i> pathVec
 
 
 
-// 路径规划算
+/*输入：无
+返回值：无
+作用：
+1.从costmap2d_ros_获取到机器人当前位姿initPose_,如果没有获取到，报错，直接返回；
+2.把机器人的初始位置由世界坐标系坐标转成map坐标系坐标mx,my,如果转换不成功，直接返回；
+3.把机器人坐标由map坐标系转换到cv坐标系，得到initPoint*/
 void CleaningPathPlanning::mainPlanningLoop()
 {
     cellIndex initPoint,nextPoint, currentPoint;
@@ -444,7 +459,7 @@ void CleaningPathPlanning::mainPlanningLoop()
     initPoint.row = cellMat_.rows - my/SIZE_OF_CELL - 1;
     initPoint.col = mx/SIZE_OF_CELL;
 
-
+/*currentPoint最开始为initPoint,路径的第一个点就是initPoint,*/
     currentPoint = initPoint;
     pathVec_.clear();
     pathVec_.push_back(initPoint);
@@ -470,10 +485,14 @@ void CleaningPathPlanning::mainPlanningLoop()
         int maxIndex = 0;
         float max_v = -3;
         neuralizedMat_.at<float>(currentPoint.row ,currentPoint.col) = -2.0;  //返回容器位置为n的元素的引用
+        /*id为0,1,2,3的时候，thetaVec的取值不同，此时deltaTheta会不同。当id为0,1,2,3的时候，分别对应的是当前点
+        对应的格子的右-》上-》左-》下，把当前角度设为90度，是为了优先往上或者说往前，当前进入判断之前，会先确保当前格子不
+        在地图的边缘，如果当前点格子已经是地图的边缘的话，那么算出的v是-2，如果格子对应的是障碍物，那么v为-1,否则
+        都是大于0的*/
         for(int id = 0; id < 4; id++)
         {
-            deltaTheta = max(thetaVec[id],lasttheta)-min(thetaVec[id],lasttheta);
-            if(deltaTheta>180) deltaTheta=360-deltaTheta;
+            deltaTheta = max(thetaVec[id], lasttheta) - min(thetaVec[id], lasttheta);
+            if(deltaTheta > 180) deltaTheta = 360 - deltaTheta;
             e = 1 - abs(deltaTheta) / 180;
             switch (id)
             {
@@ -503,7 +522,9 @@ void CleaningPathPlanning::mainPlanningLoop()
             }
         }
 
-
+/*如果max_v<=0,也就是说当前格子在地图的边缘或者周围的4个格子都是障碍物，此时遍历freeSpaceVec_，找到自由空间与当前
+格子最小距离的格子。当然最小距离为0或者min_index不对也是不行的。此时取距离最小的为nextPoint,当前点更新为nextPoint,
+并把nextPoint放入路径pathVec_中*/
         if(max_v <= 0)
         {
             float dist = 0.0, min_dist = 100000;
@@ -537,6 +558,7 @@ void CleaningPathPlanning::mainPlanningLoop()
         }
 
         //next point.
+        /*maxIndex对应的是id,id为0,1,2,3分别对应的是右-》上-》左-》下，这样就可以得到下一次所走格子的编号*/
         switch (maxIndex)
         {
         case 0:
