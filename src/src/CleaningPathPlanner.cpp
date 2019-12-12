@@ -37,6 +37,11 @@ CleaningPathPlanning::CleaningPathPlanning(costmap_2d::Costmap2DROS *costmap2d_r
     for(int r = 0; r < sizey; r++){
       for(int c = 0; c < sizex; c++ ){
           srcMap_.at<uchar>(r,c) = costmap2d_->getCost(c,sizey-r-1);//??sizey-r-1 caution: costmap's origin is at left bottom ,while opencv's pic's origin is at left-top.
+//          if(srcMap_.at<uchar>(r,c) != costmap_2d::INSCRIBED_INFLATED_OBSTACLE
+//          && srcMap_.at<uchar>(r,c) != costmap_2d::FREE_SPACE){
+//              ROS_INFO("unknown cost %d", srcMap_.at<uchar>(r,c));
+//              srcMap_.at<uchar>(r,c) = costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
+//          }
       }
     }
 
