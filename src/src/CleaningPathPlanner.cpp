@@ -105,8 +105,7 @@ vector<geometry_msgs::PoseStamped> CleaningPathPlanning::GetPathInROS()
         CellTOCell_last_theta= CellTOCell_theta;
         pathVecInROS_.push_back(posestamped);
     }
-
-   // pathVecInROS_.insert(pathVecInROS_.begin(),);
+    pathVecInROS_.erase(pathVecInROS_.begin());  //清除路径的第一个点
     publishPlan(pathVecInROS_);
     cout<<"The Filtered path size is "<<pathVecInROS_.size()<<endl;
     return pathVecInROS_;
@@ -304,7 +303,6 @@ bool CleaningPathPlanning::cellContainsPoint(Point2i pt, cellIndex cell)
     return pt.y>cell.row*SIZE_OF_CELL && pt.y<(cell.row+1)*SIZE_OF_CELL
             && pt.x>cell.col*SIZE_OF_CELL && pt.x<(cell.col+1)*SIZE_OF_CELL;
 }
-
 bool CleaningPathPlanning::initializeMats()
 {
     //initialize the member variables.
@@ -369,12 +367,12 @@ void CleaningPathPlanning::initializeNeuralMat(Mat cellMat, Mat neuralizedMat)
         for(j = 0;j< neuralizedMat.cols; j++ )
         {
             if(cellMat.at<uchar>(i,j) == costmap_2d::LETHAL_OBSTACLE) neuralizedMat.at<float>(i,j) = -1.0;
-            else if(neuralizedMat.rows <= neuralizedMat.cols)
+            else if(neuralizedMat.rows >= neuralizedMat.cols)
             {
 
                 neuralizedMat.at<float>(i,j) = 1.0 / j;
             }
-            else if(neuralizedMat.rows > neuralizedMat.cols)
+            else if(neuralizedMat.rows < neuralizedMat.cols)
             {
                 neuralizedMat.at<float>(i,j) = 1.0 / i;
             }
